@@ -1,4 +1,5 @@
 #include <28BYJStepper.h>
+#include <Servo.h>
 #include <Ultrasonic.h>
 
 /*
@@ -18,6 +19,15 @@
 
 Stepper lm(lm1, lm2, lm3, lm4);
 Stepper rm(rm1, rm2, rm3, rm4);
+
+/*
+ *  SERVO MOTOR
+ */
+Servo servo;
+#define smp 52
+#define centerPos 85
+#define leftPos 200
+#define rightPos 0
 
 /*
  *  ULTRASONIC SENSOR
@@ -43,6 +53,9 @@ String route;
 void setup() {
   lm.begin();
   rm.begin();
+
+  servo.attach(smp);
+  servo.write(rightPos);
   
   us.begin();
 
@@ -52,13 +65,13 @@ void setup() {
 void loop() {
   if(enabled) {
     long distance = getDistance();
-    Serial.println(distance);
+    long smallestDistance = getSmallestDistance();
 
-    if(distance > wallDistance + hysterisis) {
+    if(smallestDistance > wallDistance + hysterisis) {
       right((distance - wallDistance) * 10);
       shortForeward();
-    } else if(distance < wallDistance - hysterisis) {
-      left((wallDistance - distance) * 10);
+    } else if(smallestDistance < wallDistance - hysterisis) {
+      left((wallDistance - smallestDistance) * 10);
       shortForeward();
     } else {
       foreward();
@@ -99,5 +112,47 @@ void right(int steps) {
 }
 
 long getDistance() {
+  servo.write(rightPos);
+  delay(200);
+  
   return us.read();
+}
+
+long getSmallestDistance() {
+  int maxDeflection = centerPos;
+  int minDeflection = rightPos;
+  int deflection = minDeflection;
+  
+  long[] distances = new int[maxDeflection - minDeflection];
+
+  servo.write(minDeflection);
+  delay(200);
+
+  long smallestDistance = 0;
+
+  for(int i = 0; i < maxDeflection - minDeflection; i++) {
+    servo.write(deflection);
+    delay(10);
+    long distance = us.read();
+    distances[i] = distance;
+
+    int smallerDistances = 0;
+
+    for(int j = 1; j < 20; j++) {
+      if(distance >= distances[i - j]) {
+        smallerDistances++;
+      }
+    }
+
+    if(smallerDistances >= 10) {
+      smallestDistance = distance;
+      break;
+    }
+  }
+
+  if(smallestDistance == 0) {
+    smallestDistance = distances[maxDeflection - minDeflection - 1];
+  }
+
+  return smallestDistance;
 }
