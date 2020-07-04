@@ -123,7 +123,7 @@ long getSmallestDistance() {
   int minDeflection = rightPos;
   int deflection = minDeflection;
   
-  long[] distances = new int[maxDeflection - minDeflection];
+  long distances[maxDeflection - minDeflection];
 
   servo.write(minDeflection);
   delay(200);
