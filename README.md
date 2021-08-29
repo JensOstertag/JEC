@@ -12,6 +12,10 @@ Before printing the Models, have a Look at the "REDME" File in the corresponding
 <br><br>
 # JEC - Generations
 <h3>Generation 0</h3>
+<h4>JEC-0.6G</h4>
+
+JEC Gen0.6 is a Prototype of the JEC Robot. It's based on JEC-0G, but now it's logging the previous Route with up to 128 Route Elements. It's also checking the Distance of a Direction before driving, therefore whilst it is in Manual Route Mode it can't bump into Stuff. As a side Improvement, the Source Code has been beautified.
+
 <h4>JEC-0.5G</h4>
 
 JEC Gen0.5 is an alternative JEC Prototype that drives along a Wall with a somewhat constant Distance of about 20cm. It uses the exact same Hardware as JEC Gen0. 
